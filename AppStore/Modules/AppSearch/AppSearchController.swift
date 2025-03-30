@@ -11,22 +11,58 @@ class AppSearchController: UICollectionViewController {
     // 2
     let cellId = "cell"
     
+    private var appResults = [Result]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = . gray
         
         // 3 UICollectionViewCell.self
         collectionView.register(SearchResultCell.self, forCellWithReuseIdentifier: cellId)
+        
+        fetchData()
     }
+    
+    
+    func fetchData() {
+        let urlString = "https://itunes.apple.com/search?term=instagram&entity=software"
+        guard let url = URL(string: urlString) else { return }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error {
+                print("DEBUG: ERROR")
+                return
+            }
+            
+            guard let data = data else { return }
+            
+            do {
+                let searchResult = try JSONDecoder().decode(SearchResult.self, from: data)
+                self.appResults = searchResult.results
+                
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+                print(searchResult.resultCount)
+            } catch {
+                print("DEBUG: Failed to decode")
+            }
+        }.resume()
+    }
+    
     
     // 4
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return appResults.count
     }
     
     // 1
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
+        let app = appResults[indexPath.item]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! SearchResultCell
+        cell.titleLabel.text = app.trackName
+        cell.categoryLabel.text = app.primaryGenreName
+        cell.ratingLabel.text = String(format: "%.2f", app.averageUserRating ?? "Not rated yet")
         return cell
     }
     
