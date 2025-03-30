@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class AppSearchController: UICollectionViewController {
     // 2
@@ -45,11 +46,9 @@ class AppSearchController: UICollectionViewController {
     
     // 1
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let app = appResults[indexPath.item]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! SearchResultCell
-        cell.titleLabel.text = app.trackName
-        cell.categoryLabel.text = app.primaryGenreName
-        cell.ratingLabel.text = String(format: "%.2f", app.averageUserRating ?? "Not rated yet")
+        cell.configure(with: appResults[indexPath.item])
+        
         return cell
     }
     

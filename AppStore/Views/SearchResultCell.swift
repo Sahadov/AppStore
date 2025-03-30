@@ -8,11 +8,13 @@
 import UIKit
 
 class SearchResultCell: UICollectionViewCell {
+   
     
     let appIconImageView: UIImageView = {
         let iv = UIImageView()
         iv.backgroundColor = .red
         iv.layer.cornerRadius = 12
+        iv.clipsToBounds = true
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
@@ -89,6 +91,11 @@ class SearchResultCell: UICollectionViewCell {
     func createScreenShotImageView() -> UIImageView {
         let imageView = UIImageView()
         imageView.backgroundColor = .blue
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        imageView.layer.borderWidth = 0.5
+        imageView.layer.borderColor = UIColor(white: 0.5, alpha: 0.5).cgColor
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }
     
@@ -127,5 +134,24 @@ class SearchResultCell: UICollectionViewCell {
             button.widthAnchor.constraint(equalToConstant: 80),
             button.heightAnchor.constraint(equalToConstant: 32),
         ])
+    }
+    
+    func configure(with app: Result) {
+        self.titleLabel.text = app.trackName
+        self.categoryLabel.text = app.primaryGenreName
+        self.ratingLabel.text = String(format: "%.2f", app.averageUserRating ?? "Not rated yet")
+        self.appIconImageView.sd_setImage(with: URL(string: app.artworkUrl100))
+        
+        if app.screenshotUrls.count > 0 {
+            self.screenShot1ImageView.sd_setImage(with: URL(string: app.screenshotUrls[0]), placeholderImage: UIImage(named: "placeholder"))
+        }
+        
+        if app.screenshotUrls.count > 1 {
+            self.screenShot2ImageView.sd_setImage(with: URL(string: app.screenshotUrls[1]), placeholderImage: UIImage(named: "placeholder"))
+        }
+        
+        if app.screenshotUrls.count > 2 {
+            self.screenShot3ImageView.sd_setImage(with: URL(string: app.screenshotUrls[2]), placeholderImage: UIImage(named: "placeholder"))
+        }
     }
 }
