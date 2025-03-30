@@ -25,31 +25,18 @@ class AppSearchController: UICollectionViewController {
     
     
     func fetchData() {
-        let urlString = "https://itunes.apple.com/search?term=instagram&entity=software"
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error {
-                print("DEBUG: ERROR")
+        NetworkService.shared.fetchApps { (result, err) in
+            if let err {
+                print("Failed to fetch", err)
                 return
             }
             
-            guard let data = data else { return }
-            
-            do {
-                let searchResult = try JSONDecoder().decode(SearchResult.self, from: data)
-                self.appResults = searchResult.results
-                
-                DispatchQueue.main.async {
-                    self.collectionView.reloadData()
-                }
-                print(searchResult.resultCount)
-            } catch {
-                print("DEBUG: Failed to decode")
+            self.appResults = result
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
             }
-        }.resume()
+        }
     }
-    
     
     // 4
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
