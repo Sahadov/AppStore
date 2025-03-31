@@ -8,11 +8,24 @@
 import UIKit
 import SDWebImage
 
-class AppSearchController: UICollectionViewController {
+class AppSearchController: UICollectionViewController, UISearchBarDelegate {
+    var timer: Timer?
+    
     // 2
     let cellId = "cell"
     
+    private let searchController = UISearchController(searchResultsController: nil)
     private var appResults = [Result]()
+    
+    private let emptySearchLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Please, enter search term above..."
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,12 +34,14 @@ class AppSearchController: UICollectionViewController {
         // 3 UICollectionViewCell.self
         collectionView.register(SearchResultCell.self, forCellWithReuseIdentifier: cellId)
         
-        fetchData()
+        setupSearchBar()
+        collectionView.addSubview(emptySearchLabel)
+        setConstraints()
     }
     
     
-    func fetchData() {
-        NetworkService.shared.fetchApps { (result, err) in
+    func fetchData(with searchTerm: String = "Instagram") {
+        NetworkService.shared.fetchApps(searchTerm: searchTerm) { (result, err) in
             if let err {
                 print("Failed to fetch", err)
                 return
@@ -39,8 +54,31 @@ class AppSearchController: UICollectionViewController {
         }
     }
     
+    func setupSearchBar() {
+        definesPresentationContext = true
+        navigationItem.searchController = self.searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+                self.fetchData(with: searchText)
+        }
+    }
+    
+    func setConstraints() {
+        NSLayoutConstraint.activate([
+            emptySearchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptySearchLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
     // 4
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        emptySearchLabel.isHidden = appResults.count != 0
         return appResults.count
     }
     
