@@ -12,8 +12,8 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        viewControllers = [createNavController(viewController: AppSearchController(), title: "Home", imageName: "trash.circle"),
-                           createNavController(viewController: HomeViewController(), title: "Red", imageName: "pencil.tip.crop.circle"),
+        viewControllers = [createNavController(viewController: AppsViewController(), title: "Home", imageName: "trash.circle"),
+                           createNavController(viewController: AppSearchController(), title: "Red", imageName: "pencil.tip.crop.circle"),
                            createNavController(viewController: HomeViewController(), title: "Blue", imageName: "rectangle.portrait.and.arrow.right.fill")]
     }
     
