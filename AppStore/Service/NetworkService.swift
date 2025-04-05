@@ -16,7 +16,6 @@ class NetworkService {
                 
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error {
-                print("DEBUG: ERROR")
                 completion([], nil)
                 return
             }
@@ -45,7 +44,6 @@ class NetworkService {
                 return
             }
             do {
-                //print(String(data: data!, encoding: .utf8))
                 let appGroup = try JSONDecoder().decode(AppGroup.self, from: data!)
                 completion(appGroup, nil)
             } catch {

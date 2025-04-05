@@ -9,8 +9,7 @@ import UIKit
 
 
 final class AppsViewController: UICollectionViewController {
-    var editorsChoiceGames: AppGroup?
-    var topApps: AppGroup?
+    var groups = [AppGroup]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +21,6 @@ final class AppsViewController: UICollectionViewController {
         collectionView.contentInset.top = 25
         
         fetchData()
-        fetchDataApps()
         
     }
         
@@ -35,30 +33,31 @@ final class AppsViewController: UICollectionViewController {
     }
     
     func fetchData() {
+        var group1: AppGroup?
+        var group2: AppGroup?
+        
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
         NetworkService.shared.fetchGames { (appGroup, err) in
-            if let err = err {
-                print("Failed to fetch games:", err)
-                return
-            }
-            
-            self.editorsChoiceGames = appGroup
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
+            dispatchGroup.leave()
+            group1 = appGroup
         }
-    }
-    
-    func fetchDataApps() {
+        
+        dispatchGroup.enter()
         NetworkService.shared.fetchBestApps { (appGroup, err) in
-            if let err = err {
-                print("Failed to fetch games:", err)
-                return
+            dispatchGroup.leave()
+            group2 = appGroup
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if let group = group1 {
+                self.groups.append(group)
             }
-            
-            self.topApps = appGroup
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
+            if let group = group2 {
+                self.groups.append(group)
             }
+            self.collectionView.reloadData()
         }
     }
 }
@@ -72,9 +71,15 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
         if section == 0 {
             return 8
         } else if section == 1 {
-            return editorsChoiceGames?.feed.results.count ?? 0
+            if groups.indices.contains(0) {
+                return groups[0].feed.results.count
+            }
+            return 0
         }
-        return 10
+        if groups.indices.contains(1) {
+            return groups[1].feed.results.count
+        }
+        return 0
     }
     
     
@@ -84,15 +89,23 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
 
             return cell
         } else if indexPath.section == 1 {
-            guard let app = editorsChoiceGames?.feed.results[indexPath.item] else {
-                        return UICollectionViewCell() // fallback
+            if groups.indices.contains(0) {
+                let results = groups[0].feed.results
+                let app = results[indexPath.item]
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsRowCell.identifier, for: indexPath) as! AppsRowCell
+                cell.configure(with: app)
+                return cell
             }
+            return UICollectionViewCell()
+        }
+        if groups.indices.contains(1) {
+            let results = groups[1].feed.results
+            let app = results[indexPath.item]
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsRowCell.identifier, for: indexPath) as! AppsRowCell
             cell.configure(with: app)
             return cell
         }
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsRowCell.identifier, for: indexPath) as! AppsRowCell
-        return cell
+        return UICollectionViewCell()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
