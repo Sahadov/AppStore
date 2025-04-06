@@ -12,9 +12,9 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        viewControllers = [createNavController(viewController: AppsViewController(), title: "Apps", imageName: "trash.circle"),
-                           createNavController(viewController: AppSearchController(), title: "Search", imageName: "pencil.tip.crop.circle"),
-                           createNavController(viewController: HomeViewController(), title: "Blue", imageName: "rectangle.portrait.and.arrow.right.fill")]
+        viewControllers = [createNavController(viewController: AppsViewController(), title: "Apps", imageName: "square.stack.3d.up.fill"),
+                           createNavController(viewController: AppSearchController(), title: "Search", imageName: "magnifyingglass"),
+                           createNavController(viewController: HomeViewController(), title: "Profile", imageName: "person.fill")]
     }
     
     
