@@ -19,7 +19,6 @@ class AppsHeaderCell: UICollectionViewCell {
         super.init(frame: frame)
         
         companyLabel.textColor = .blue
-        imageView.backgroundColor = .red
         titleLabel.numberOfLines = 0
         titleLabel.lineBreakMode = .byWordWrapping
         
@@ -45,5 +44,11 @@ class AppsHeaderCell: UICollectionViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    func configure(with app: SocialApp) {
+        self.companyLabel.text = app.tagline
+        self.titleLabel.text = app.name
+        self.imageView.sd_setImage(with: URL(string: app.imageUrl))
     }
 }

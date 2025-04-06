@@ -10,6 +10,16 @@ import UIKit
 
 final class AppsViewController: UICollectionViewController {
     var groups = [AppGroup]()
+    var headerApps = [SocialApp]()
+    
+    let activityIndicatorView: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView(style: .large)
+        aiv.color = .black
+        aiv.startAnimating()
+        aiv.hidesWhenStopped = true
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        return aiv
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +30,7 @@ final class AppsViewController: UICollectionViewController {
         
         collectionView.contentInset.top = 25
         
+        setActivityIndicator()
         fetchData()
         
     }
@@ -35,8 +46,14 @@ final class AppsViewController: UICollectionViewController {
     func fetchData() {
         var group1: AppGroup?
         var group2: AppGroup?
-        
+
         let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
+        NetworkService.shared.fetchSocialApps { (apps, err) in
+            dispatchGroup.leave()
+            self.headerApps = apps ?? []
+        }
         
         dispatchGroup.enter()
         NetworkService.shared.fetchGames { (appGroup, err) in
@@ -50,7 +67,15 @@ final class AppsViewController: UICollectionViewController {
             group2 = appGroup
         }
         
+        dispatchGroup.enter()
+        NetworkService.shared.fetchBestApps { (appGroup, err) in
+            dispatchGroup.leave()
+            group2 = appGroup
+        }
+        
         dispatchGroup.notify(queue: .main) {
+            self.activityIndicatorView.stopAnimating()
+            
             if let group = group1 {
                 self.groups.append(group)
             }
@@ -69,7 +94,7 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return 8
+            return headerApps.count
         } else if section == 1 {
             if groups.indices.contains(0) {
                 return groups[0].feed.results.count
@@ -85,8 +110,9 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
+            let app = headerApps[indexPath.item]
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsHeaderCell.identifier, for: indexPath) as! AppsHeaderCell
-
+            cell.configure(with: app)
             return cell
         } else if indexPath.section == 1 {
             if groups.indices.contains(0) {
@@ -231,5 +257,16 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
             return header
         }
         return UICollectionReusableView()
+    }
+    
+    func setActivityIndicator() {
+        view.addSubview(activityIndicatorView)
+        
+        NSLayoutConstraint.activate([
+            activityIndicatorView.topAnchor.constraint(equalTo: view.topAnchor),
+            activityIndicatorView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            activityIndicatorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            activityIndicatorView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        ])
     }
 }

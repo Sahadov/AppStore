@@ -11,7 +11,8 @@ class NetworkService {
     static let shared = NetworkService()
     
     func fetchApps(searchTerm: String, completion: @escaping ([Result], Error?) -> () ) {
-        let urlString = "https://itunes.apple.com/search?term=\(searchTerm)&entity=software"
+        //let urlString = "https://itunes.apple.com/search?term=\(searchTerm)&entity=software"
+        let urlString = "https://rss.applemarketingtools.com/api/v2/us/apps/top-paid/50/apps.json"
         guard let url = URL(string: urlString) else { return }
                 
         URLSession.shared.dataTask(with: url) { data, response, error in
@@ -35,7 +36,7 @@ class NetworkService {
     
     
     func fetchGames(completion: @escaping (AppGroup?, Error?) -> ()) {
-        let urlString = "https://rss.applemarketingtools.com/api/v2/us/apps/top-free/50/apps.json"
+        let urlString = "https://rss.applemarketingtools.com/api/v2/us/apps/top-paid/50/apps.json"
         guard let url = URL(string: urlString) else { return }
         
         URLSession.shared.dataTask(with: url) { (data, resp, err) in
@@ -68,6 +69,23 @@ class NetworkService {
                 completion(nil, error)
             }
         }.resume()
+    }
+    
+    func fetchSocialApps(completion: @escaping ([SocialApp]?, Error?) -> Void) {
+        let urlString = "https://api.letsbuildthatapp.com/appstore/social"
+        guard let url = URL(string: urlString) else { return }
+        URLSession.shared.dataTask(with: url) { (data, resp, err) in
+            if let err = err {
+                completion(nil, err)
+                return
+            }
+            do {
+                let objects = try JSONDecoder().decode([SocialApp].self, from: data!)
+                completion(objects, nil)
+            } catch {
+                completion(nil, error)
+            }
+            }.resume()
     }
     
     
