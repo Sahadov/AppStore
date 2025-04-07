@@ -41,13 +41,13 @@ class AppSearchController: UICollectionViewController, UISearchBarDelegate {
     
     
     func fetchData(with searchTerm: String = "Instagram") {
-        NetworkService.shared.fetchApps(searchTerm: searchTerm) { (result, err) in
+        NetworkService.shared.fetchApps(searchTerm: searchTerm) { (res, err) in
             if let err {
                 print("Failed to fetch", err)
                 return
             }
             
-            self.appResults = result
+            self.appResults = res?.results ?? []
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
