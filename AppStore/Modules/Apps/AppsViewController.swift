@@ -39,6 +39,7 @@ final class AppsViewController: UICollectionViewController {
         super.init(collectionViewLayout: AppsViewController.createLayout())
     }
     
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -163,7 +164,7 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
             )
             
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
+            section.orthogonalScrollingBehavior = .groupPagingCentered
             section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 20, trailing: 0)
             return section
 
@@ -184,7 +185,7 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
             group.interItemSpacing = .fixed(15)
             
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
+            section.orthogonalScrollingBehavior = .groupPagingCentered
             section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0)
             
             // header
@@ -215,7 +216,7 @@ extension AppsViewController: UICollectionViewDelegateFlowLayout {
             group.interItemSpacing = .fixed(15)
             
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
+            section.orthogonalScrollingBehavior = .groupPagingCentered
             section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0)
             
             // header

@@ -39,6 +39,10 @@ class AppSearchController: UICollectionViewController, UISearchBarDelegate {
         setConstraints()
     }
     
+    deinit {
+        timer?.invalidate()
+    }
+    
     
     func fetchData(with searchTerm: String = "Instagram") {
         NetworkService.shared.fetchApps(searchTerm: searchTerm) { (res, err) in
