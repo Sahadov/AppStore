@@ -11,7 +11,7 @@ class NetworkService {
     static let shared = NetworkService()
     
     func fetchApps(searchTerm: String, completion: @escaping (SearchResult?, Error?) -> () ) {
-        let urlString = "https://rss.applemarketingtools.com/api/v2/us/apps/top-paid/50/apps.json"
+        let urlString = "https://itunes.apple.com/search?term=\(searchTerm)&entity=software"
         fetchGenericJSONData(urlString: urlString, completion: completion)
     }
     
